@@ -1,1 +1,1 @@
-# Demultiplexing-of-Patient-Samples
+# Demultiplexing of Patient Samples
