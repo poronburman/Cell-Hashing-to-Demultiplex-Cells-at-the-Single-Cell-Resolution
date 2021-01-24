@@ -1,0 +1,103 @@
+---
+title: "Untitled"
+author: "Poromendro Nath Burman"
+date: "1/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**1. Import the library**
+```{r}
+library(Seurat)
+```
+
+**2. Import Data**
+```{r}
+# load the UMI matrix
+pbmc.umis <- readRDS("./pbmc_umi_mtx.rds")
+
+# load the HTO count matrix
+pbmc.htos <- readRDS("./pbmc_hto_mtx.rds")
+```
+
+**3. Set up seurat object for the HTO data**
+```{r}
+# setup seurat object
+pbmc.hashtag <- CreateSeuratObject(counts = pbmc.umis)
+
+# normalize RNA data with log normalization
+pbmc.hashtag <- NormalizeData(pbmc.hashtag)
+
+# find variable features
+pbmc.hashtag <- FindVariableFeatures(pbmc.hashtag, selection.method = "mean.var.plot")
+
+# scale variable features
+pbmc.hashtag <- ScaleData(pbmc.hashtag, features = VariableFeatures(pbmc.hashtag))
+```
+
+**4. Add HTO data as an independent assay**
+```{r}
+# add HTO data as a new assay
+pbmc.hashtag[["HTO"]] <- CreateAssayObject(counts = pbmc.htos)
+
+# normalize the HTO data
+pbmc.hashtag <- NormalizeData(pbmc.hashtag, assay = "HTO", normalization.method = "CLR")
+```
+
+**5. Demultiplex**
+```{r}
+pbmc.hashtag <- HTODemux(pbmc.hashtag, assay = "HTO", positive.quantile = 0.99)
+```
+
+**6 Visualize the demultiplex results**
+
+**a. global classification results**
+```{r}
+table(pbmc.hashtag$HTO_classification.global)
+```
+
+**b. group cells based on max HTO signal**
+```{r}
+Idents(pbmc.hashtag) <- "HTO_maxID"
+RidgePlot(pbmc.hashtag, assay = "HTO", features = rownames(pbmc.hashtag[["HTO"]])[1:2], ncol = 2)
+```
+
+**c. Visualize pairs of HTO signals for mutual exclusivity in singlets**
+```{r}
+FeatureScatter(pbmc.hashtag, feature1 = "hto_HTO-A", feature2 = "hto_HTO-B")
+```
+
+**d. compare UMIs for singlets, doublets and negative cells**
+```{r}
+Idents(pbmc.hashtag) <- "HTO_classification.global"
+VlnPlot(pbmc.hashtag, features = "nCount_RNA", pt.size = 0.1, log = TRUE)
+```
+
+**e. tSNE**
+```{r}
+# remove negative cells
+pbmc.hashtag.subset <- subset(pbmc.hashtag, idents = "Negative", invert = TRUE)
+
+# calculate and plot tSNE
+DefaultAssay(pbmc.hashtag.subset) <- "HTO"
+
+pbmc.hashtag.subset <- ScaleData(pbmc.hashtag.subset, features = rownames(pbmc.hashtag.subset), verbose = FALSE)
+
+pbmc.hashtag.subset <- RunPCA(pbmc.hashtag.subset, features = rownames(pbmc.hashtag.subset), approx = FALSE)
+
+pbmc.hashtag.subset <- RunTSNE(pbmc.hashtag.subset, dims = 1:8, perplexity = 100)
+
+DimPlot(pbmc.hashtag.subset, split.by = "HTO_classification.global")
+```
+
+**f. Heatmap**
+```{r}
+HTOHeatmap(pbmc.hashtag, assay = "HTO", ncells = 5000)
+```
+
+
+
+
