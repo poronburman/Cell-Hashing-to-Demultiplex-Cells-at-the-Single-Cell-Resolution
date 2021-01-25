@@ -16,6 +16,7 @@ Based upon the maximum HTO signal, HTO-A and HTO-B seem to be the most highly ex
 ![](Figures/Ridgeplot.png)
 
 **Mutual exclusivity of HTO-A and HTO-B**
+Observing the Feature Scatterplot between HTO-A and HTO-B, one can observe that there isn't mutual exclusivity between the HTOs.
 
-![](Figures/Feature Scatterplot.png)    
+![](Figures/Scatterplot.png)    
 
