@@ -34,3 +34,5 @@ The tSNE plot shows how Singlets are separated from Doublets.
 The heatmap shows how the majority of the HTOs are exclusive for a specific patient sample.
 
 ![](Figures/heatmap.png)
+
+Hence, this paper provides a very good and efficient approach for demultiplexing cells from multiple samples. This can help us to mix multiple samples with multiple different conditions and run them on the same 10X Chromium chip.
