@@ -1,4 +1,4 @@
-# Project 1: Cell Hashing to Demultiplex Cells at the Single Cell Resolution
+# Cell Hashing to Demultiplex Cells at the Single Cell Resolution
 
 In this project, I've reanalyzed the data generated from the published paper https://genomebiology.biomedcentral.com/articles/10.1186/s13059-018-1603-1.
 
